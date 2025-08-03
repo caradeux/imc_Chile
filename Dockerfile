@@ -1,4 +1,4 @@
-# --- Etapa de construcción ---
+# Build stage
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -10,7 +10,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 
-# --- Etapa de producción ---
+# Production stage
 FROM node:18-alpine
 
 WORKDIR /app
