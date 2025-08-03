@@ -11,14 +11,20 @@ COPY . .
 RUN pnpm run build
 
 # Production stage
-FROM node:18-alpine
+FROM nginx:alpine
 
-WORKDIR /app
+COPY --from=builder /app/out /usr/share/nginx/html
 
-RUN npm install -g pnpm
+# Nginx config opcional si usas rutas internas
+RUN echo 'server { \
+  listen 80; \
+  server_name localhost; \
+  root /usr/share/nginx/html; \
+  index index.html; \
+  location / { \
+    try_files $uri $uri/ /index.html; \
+  } \
+}' > /etc/nginx/conf.d/default.conf
 
-COPY --from=builder /app ./
-RUN pnpm install --prod --frozen-lockfile
-
-EXPOSE 3000
-CMD ["pnpm", "start"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
